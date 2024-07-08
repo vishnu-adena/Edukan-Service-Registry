@@ -20,7 +20,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Expose the port the application runs on
-EXPOSE 8080
+EXPOSE 8761
 
 # Set the entry point to run the application
 ENTRYPOINT ["java", "-jar", "target/serviceRegistry-0.0.1.jar"]
