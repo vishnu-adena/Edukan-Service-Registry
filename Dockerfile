@@ -1,26 +1,27 @@
 # Use an official Maven image to build the application
-FROM maven:3.8.6-jdk-8-alpine AS build
+FROM maven:3.8.5-openjdk-17-slim AS build
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the dependencies file
+# Copy the pom.xml and source code into the container
 COPY pom.xml .
-
-# Copy the application code
 COPY src ./src
 
-# Build the application
-RUN mvn package
+# Package the application
+RUN mvn clean package -DskipTests
 
-# Use an official Java image to run the application
+# Use a smaller base image to run the application
 FROM eclipse-temurin:21-jre-alpine
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application JAR file
-COPY target/*.jar ./app.jar
+# Copy the JAR file from the build stage
+COPY --from=build /app/target/*.jar app.jar
 
-# Run the application
-CMD ["java", "-jar", "app.jar"]
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
